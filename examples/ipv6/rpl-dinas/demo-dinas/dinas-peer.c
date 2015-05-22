@@ -197,16 +197,10 @@ PROCESS_THREAD(dinas_peer_process, ev, data)
         else /* msg is a notification or a request */
         {	
           /*	
-          if (dinas_msg_get_type(msg->config) == 0) {	
-            PRINTF("Received notification from ");
-            PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
-            PRINTF("\n");
-          }
-          else if (dinas_msg_get_type(msg->config) == 1) {	
-            PRINTF("Received request from ");
-            PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
-            PRINTF("\n");
-          }
+          if (msg->type == 0) 	
+            PRINTF("Received notification from %s\n", short_ipaddr);
+          else if (msg->type == 1) 
+            PRINTF("Received request from from %s\n", short_ipaddr);
           */
           /*  
           PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
@@ -231,6 +225,7 @@ PROCESS_THREAD(dinas_peer_process, ev, data)
           	  reply.config = dinas_msg_set_config(0,2,0);
           	  reply.req_num = msg->req_num;
               destination_ipaddr = msg->owner_addr;
+		  PRINTF("hit %d\n", msg->req_num);
               /*
               PRINTF("Got it! Now sending reply to ");
               PRINT6ADDR(&destination_ipaddr);
@@ -383,7 +378,8 @@ PROCESS_THREAD(send_process, ev, data)
       	        //PRINTF("In my cache!\n");
       	        rep_num++;
       	        loc_rep_num++;
-          	    PRINTF("rp %d\n", msg.req_num);
+                PRINTF("hit %d\n", msg.req_num);
+          	    //PRINTF("rp %d\n", msg.req_num);
           	    return -1;
               }
   		    }

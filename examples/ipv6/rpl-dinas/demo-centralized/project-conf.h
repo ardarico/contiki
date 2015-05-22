@@ -37,9 +37,9 @@
 
 #define MAX_NUM_MSG 21
 #define NOTIFICATION_COUNTER 10
-#define NUM_ROOMS 20
+#define NUM_ROOMS 50
 #define TTL 4
-#define PERIOD 120
+#define PERIOD 600
 #define RANDWAIT (PERIOD)
 
 /* overwrite params defined in bloom.h */
@@ -47,7 +47,7 @@
 #define BLOOM_NFUNCS_PARAM 7
 
 /* overwrite params defined in proximity-cache.h */
-#define CACHE_SIZE_PARAM 20
+#define CACHE_SIZE_PARAM 50
 #define T1_PARAM 0
 #define T2_PARAM 90
 

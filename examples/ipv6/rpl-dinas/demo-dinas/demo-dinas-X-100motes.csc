@@ -684,8 +684,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>233.4187358737068</x>
-        <y>933.0674331994798</y>
+        <x>774.6352627797692</x>
+        <y>675.4438647537564</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -1464,20 +1464,6 @@
       </interface_config>
       <motetype_identifier>sky2</motetype_identifier>
     </mote>
-    <mote>
-      <breakpoints />
-      <interface_config>
-        org.contikios.cooja.interfaces.Position
-        <x>772.3660448429019</x>
-        <y>671.8230557134946</y>
-        <z>0.0</z>
-      </interface_config>
-      <interface_config>
-        org.contikios.cooja.mspmote.interfaces.MspMoteID
-        <id>101</id>
-      </interface_config>
-      <motetype_identifier>sky2</motetype_identifier>
-    </mote>
   </simulation>
   <plugin>
     org.contikios.cooja.plugins.SimControl
@@ -1495,7 +1481,7 @@
       <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.GridVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.TrafficVisualizerSkin</skin>
-      <viewport>0.5388070225776993 0.0 0.0 0.5388070225776993 123.63909815251671 -49.26024348057082</viewport>
+      <viewport>0.44900585214808275 0.0 0.0 0.44900585214808275 316.3860240091273 41.20579418457225</viewport>
     </plugin_config>
     <width>988</width>
     <z>0</z>
@@ -1619,7 +1605,6 @@
       <mote>97</mote>
       <mote>98</mote>
       <mote>99</mote>
-      <mote>100</mote>
       <showRadioRXTX />
       <showRadioHW />
       <showLEDs />

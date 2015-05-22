@@ -45,7 +45,7 @@
 #include "net/rpl/rpl.h"
 #include "rpl-updown.h"
 #include "proximity-cache.h"
-#include "bloom.h"
+#include "lib/bloom.h"
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 #define UDP_SERVER_PORT 5688
@@ -120,15 +120,16 @@ rpl_updown_recv(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_con
     //PRINTF("i = %d\n", i);
     if (i != CACHE_SIZE) 
     { 
-      //PRINTF("I've got it in my cache! Now sending reply to \n");
       DINASMSG reply;
       reply.bloom = msg->bloom;
       reply.owner_addr = proximity_cache_get_item(i)->owner_addr;
       reply.config = dinas_msg_set_config(0,2,0);
       reply.req_num = msg->req_num;
       destination_ipaddr = msg->owner_addr;
-      //PRINT6ADDR(&destination_ipaddr);
-      //PRINTF("\n");
+      PRINTF("hit %d\n", msg->req_num);
+      PRINTF("Now sending reply to ");
+      PRINT6ADDR(&destination_ipaddr);
+      PRINTF("\n");
       uip_udp_packet_sendto(client_conn, &reply, sizeof(DINASMSG), &destination_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
       return; /* comment this, if you want that multiple replies can be received by the requester */
     }

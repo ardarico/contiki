@@ -41,7 +41,7 @@
 #include "sys/clock.h"
 #include "contiki.h"
 #include "net/ip/uip.h"
-#include "bloom.h"
+#include "lib/bloom.h"
 
 
 #ifdef CACHE_SIZE_PARAM

@@ -38,7 +38,7 @@
 
 #define MAX_NUM_MSG 21
 #define NOTIFICATION_COUNTER 10 /* the pattern is N R R R R .. */
-#define NUM_ROOMS 100  /* N = number of nodes */
+#define NUM_ROOMS 20  /* N = number of nodes */
 #define TTL 3 /* this is D */
 #define PERIOD 120
 #define RANDWAIT (PERIOD)
