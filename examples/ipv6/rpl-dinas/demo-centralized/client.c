@@ -227,7 +227,7 @@ PROCESS_THREAD(send_process, ev, data)
   /*PRINTF("location: %s\n", location);*/
   bloom_add(&bloomname, location);
 
-  /* Send a packet every 120-122 seconds. */
+  /* Send a packet every PERIOD seconds. */
   etimer_set(&period_timer, CLOCK_SECOND * PERIOD);
   //PRINTF("MAX_NUM_MSG = %d \n", MAX_NUM_MSG);
   while(msg_count < MAX_NUM_MSG) {
@@ -239,7 +239,7 @@ PROCESS_THREAD(send_process, ev, data)
       {
         etimer_reset(&period_timer); /* Restart the timer from the previous expiration time */ 
         clock_time_t ctt = random_rand() % (CLOCK_SECOND * RANDWAIT);
-        /*PRINTF("ctt = %d\n", ctt);*/
+        //PRINTF("ctt = %d\n", ctt);
         etimer_set(&wait_timer, ctt);
       } 
       else if (data == &wait_timer) 

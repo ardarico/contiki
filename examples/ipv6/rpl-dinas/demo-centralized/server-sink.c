@@ -200,8 +200,8 @@ PROCESS_THREAD(dinas_sink_process, ev, data)
         //else if (msg->type == 1) /* msg is a request */ 
         else if (dinas_msg_get_type(msg->config) == 1) /* request */
         {
-  	      //PRINTF("Received request for:\n");
-  	      //bloom_print(&msg->bloom);
+  	      PRINTF("Received request for:\n");
+  	      bloom_print(&msg->bloom);
           //proximity_cache_print();
   	      /* 
            * - if the requested bloom matches one of those that are in cache, send a reply msg to the request owner 
@@ -211,15 +211,15 @@ PROCESS_THREAD(dinas_sink_process, ev, data)
           int i = proximity_cache_check_item(&ci);
           if (i != CACHE_SIZE) 
           { 
-          	//PRINTF("I've got it in my cache! Now sending reply to \n");
+          	PRINTF("I've got it in my cache! Now sending reply to \n");
             DINASMSG reply;
       		reply.bloom = msg->bloom;
       		reply.owner_addr = proximity_cache_get_item(i)->owner_addr;
       		reply.config = dinas_msg_set_config(0,2,0);
       		reply.req_num = msg->req_num;
       		destination_ipaddr = msg->owner_addr;
-      		//PRINT6ADDR(&destination_ipaddr);
-      		//PRINTF("\n");
+      		PRINT6ADDR(&destination_ipaddr);
+      		PRINTF("\n");
       		uip_udp_packet_sendto(client_conn, &reply, sizeof(DINASMSG), &destination_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
       		return 0; /* comment this, if you want that multiple replies can be received by the requester */ 
           }

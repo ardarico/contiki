@@ -226,6 +226,7 @@ PROCESS_THREAD(dinas_sink_process, ev, data)
           	  reply.config = dinas_msg_set_config(0,2,0);
           	  reply.req_num = msg->req_num;
               destination_ipaddr = msg->owner_addr;
+		PRINTF("hit %d\n", msg->req_num);
               /*
               PRINTF("Got it! Now sending reply to ");
               PRINT6ADDR(&destination_ipaddr);
@@ -380,8 +381,9 @@ PROCESS_THREAD(send_process, ev, data)
       	        //PRINTF("In my cache!\n");
       	        rep_num++;
       	        loc_rep_num++;
-          	    PRINTF("rp %d\n", msg.req_num);  
-          	    return -1;
+          	    //PRINTF("rp %d\n", msg.req_num);  
+          	PRINTF("hit %d\n", msg.req_num);    
+		return -1;
               }
   		    }
                         	
