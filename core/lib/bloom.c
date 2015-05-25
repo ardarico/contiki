@@ -1,4 +1,5 @@
-/* Copyright (c) 2015, Michele Amoretti.
+/* 
+ * Copyright (c) 2015, Michele Amoretti.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,9 +27,12 @@
  * SUCH DAMAGE.
 */
 
+/** \addtogroup bloom
+ * @{ */
+
 /**
  * \file
- *         Bloom filter
+ *         Implementation of the Bloom filter
  * \author
  *         Michele Amoretti <michele.amoretti@unipr.it> 
  */
@@ -48,80 +52,78 @@
 const unsigned char oneBits[] = {0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4};
 
 
-BLOOM bloom_create() {
-	BLOOM bloom;
-	int n;
-	
-	for (n=0; n < A_SIZE; n++) {
-		bloom.a[n] = 0;
-	}
-	
-	return bloom;
+/*---------------------------------------------------------------------------*/
+BLOOM 
+bloom_create() {
+  BLOOM bloom;
+  int n;
+
+  for(n=0; n < A_SIZE; n++) {
+    bloom.a[n] = 0;
+  }
+
+return bloom;
 }
-
-
-unsigned char bloom_count_ones(unsigned char x)
+/*---------------------------------------------------------------------------*/
+unsigned char 
+bloom_count_ones(unsigned char x)
 {
-    unsigned char results;
-    results = oneBits[x&0x0f];
-    results += oneBits[x>>4];
-    return results;
+  unsigned char results;
+  results = oneBits[x&0x0f];
+  results += oneBits[x>>4];
+  return results;
 }
-
-
-int bloom_add(BLOOM *bloom, const char *s)
+/*---------------------------------------------------------------------------*/
+void 
+bloom_add(BLOOM *bloom, const char *s)
 {
-	size_t n;
+  size_t n;
 
-	/* using the n hash functions of the Bloom filter */
-	for(n = 0; n < BLOOM_NFUNCS; ++n) {
-		SETBIT(bloom->a, crc16_data(s, strlen(s), n)%BLOOM_SIZE);
-	}
-
-	return 0;
+  /* using the n hash functions of the Bloom filter */
+  for(n = 0; n < BLOOM_NFUNCS; ++n) {
+    SETBIT(bloom->a, crc16_data(s, strlen(s), n)%BLOOM_SIZE);
+  }
 }
-
-
-int bloom_check(BLOOM *bloom, const char *s)
+/*---------------------------------------------------------------------------*/
+int 
+bloom_check(BLOOM *bloom, const char *s)
 {
-	size_t n;
+  size_t n;
 
-	/* using the n hash functions of the Bloom filter */
-	for(n = 0; n < BLOOM_NFUNCS; ++n) {
-		if(!(GETBIT(bloom->a, crc16_data( s, strlen(s), n)%BLOOM_SIZE))) return 0;
-	}
+  /* using the n hash functions of the Bloom filter */
+  for(n = 0; n < BLOOM_NFUNCS; ++n) {
+    if(!(GETBIT(bloom->a, crc16_data( s, strlen(s), n)%BLOOM_SIZE))) 
+      return 0;
+  }
 
-	return 1;
+  return 1;
 }
-
-
-int bloom_print(BLOOM *bloom)
+/*---------------------------------------------------------------------------*/
+void
+bloom_print(BLOOM *bloom)
 {
-	
-	size_t n;
-	
-	for(n = 0; n < BLOOM_SIZE; ++n) {
-		PRINTF("%s",(GETBIT(bloom->a,n))?"1":"0");
-	}
-	PRINTF("\n");
-	
-	return 1;	
+  size_t n;
+
+  for(n = 0; n < BLOOM_SIZE; ++n) {
+    PRINTF("%s",(GETBIT(bloom->a,n))?"1":"0");
+  }
+  PRINTF("\n");	
 }
+/*---------------------------------------------------------------------------*/
+int 
+bloom_distance(BLOOM *bloom1, BLOOM *bloom2) 
+{ 
+  int dist;
+  int i;
 
+  dist = 0;
+  for(i = 0; i < A_SIZE; ++i) {
+    dist = dist + bloom_count_ones(bloom1->a[i] ^ bloom2->a[i]);
+  }
 
-int bloom_distance(BLOOM *bloom1, BLOOM *bloom2) { 
-	int dist;
-	int i;
-	
-	dist = 0;
-	for (i = 0; i < A_SIZE; ++i)
-	{
-		dist = dist + bloom_count_ones(bloom1->a[i] ^ bloom2->a[i]);
-	}
-	
-	return dist;
+  return dist;
 }
+/*---------------------------------------------------------------------------*/
 
-
-
+/** @} */
 
