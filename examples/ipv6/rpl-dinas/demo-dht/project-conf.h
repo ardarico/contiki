@@ -28,58 +28,29 @@
 
 /**
  * \file
- *         Proximity Cache
+ *         Configuration file for demo-dht
  * \author
  *         Michele Amoretti <michele.amoretti@unipr.it> 
  */
 
-#ifndef __PROXIMITY_CACHE_H__
-#define __PROXIMITY_CACHE_H__
+#define UIP_CONF_TCP 0
+#define PROCESS_CONF_NO_PROCESS_NAMES 1
 
-#include <stdlib.h>
-#include <stddef.h> /*for size_t*/
-#include "sys/clock.h"
-#include "contiki.h"
-#include "net/ip/uip.h"
-#include "lib/bloom.h"
+#define MAX_NUM_MSG 21
+#define NOTIFICATION_COUNTER 10 /* the pattern is N R R R R .. */
+#define NUM_ROOMS 20  /* N = number of nodes */
+#define TTL 31 /* this is D in RPL-DHT, it is the max TTL allowed by DINASMSG */
+#define PERIOD 120
+#define RANDWAIT (PERIOD)
 
+/* overwrite params defined in bloom.h */
+#define BLOOM_SIZE_PARAM 40
+#define BLOOM_NFUNCS_PARAM 7
 
-#ifdef CACHE_SIZE_PARAM
-#define CACHE_SIZE CACHE_SIZE_PARAM
-#else 
-#define CACHE_SIZE 3
-#endif
-
-#ifdef T1_PARAM
-#define T1 T1_PARAM
-#else 
-#define T1 30 /* this is a percentage; also T2 */
-#endif
-
-#ifdef T2_PARAM
-#define T2 T2_PARAM
-#else 
-#define T2 90 /* T2 > T1 always! */
-#endif
+/* overwrite params defined in proximity-cache.h */
+#define CACHE_SIZE_PARAM 8 /* this is C */
+#define T1_PARAM 30
+#define T2_PARAM 90
 
 
 
-#define SHORT_ADDR_SIZE 19
-
-typedef struct cache_item {
-	BLOOM bloomname;
-	uip_ipaddr_t owner_addr;
-	uip_ipaddr_t provider_neighbor_addr;
-	clock_time_t timestamp;
-} CACHEITEM;
-
-int proximity_cache_init();
-int proximity_cache_size();
-int proximity_cache_add_item(CACHEITEM ci);
-int proximity_cache_force_add_item(CACHEITEM ci);
-int proximity_cache_print();
-int proximity_cache_check_item(CACHEITEM* ci);
-CACHEITEM* proximity_cache_get_item(int i);
-CACHEITEM* proximity_cache_get_most_similar_item(BLOOM* bloomname, uip_ipaddr_t* provider_ipaddr);
-
-#endif

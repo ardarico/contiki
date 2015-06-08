@@ -28,58 +28,35 @@
 
 /**
  * \file
- *         Proximity Cache
+ *         RPL-based DHT overlay routing for DINAS
  * \author
  *         Michele Amoretti <michele.amoretti@unipr.it> 
  */
 
-#ifndef __PROXIMITY_CACHE_H__
-#define __PROXIMITY_CACHE_H__
+#ifndef __RPL_DHT_H__
+#define __RPL_DHT_H__
 
-#include <stdlib.h>
-#include <stddef.h> /*for size_t*/
-#include "sys/clock.h"
 #include "contiki.h"
 #include "net/ip/uip.h"
-#include "lib/bloom.h"
+#include "dinas-msg.h"
 
-
-#ifdef CACHE_SIZE_PARAM
-#define CACHE_SIZE CACHE_SIZE_PARAM
-#else 
-#define CACHE_SIZE 3
+#ifdef FLOODING_PARAM
+#define FLOODING FLOODING_PARAM
+#else
+#define FLOODING 0
 #endif
 
-#ifdef T1_PARAM
-#define T1 T1_PARAM
-#else 
-#define T1 30 /* this is a percentage; also T2 */
-#endif
+int rpl_dht_check_cache(DINASMSG* msg);
+uip_ipaddr_t* rpl_dht_get_parent_ipaddr();
+void rpl_dht_init(void);
+uip_ipaddr_t* rpl_dht_find_successor(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr);
+void rpl_dht_recv(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* client_conn);
+void rpl_dht_send(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* client_conn);
+void rpl_dht_send_to_children(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* client_conn);
+int rpl_dht_sent_messages();
+void rpl_dht_set_parent();
+void rpl_dht_set_children();
+void rpl_dht_add_child_announcement(DINASMSG* msg);
+void rpl_dht_store_item(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr);
 
-#ifdef T2_PARAM
-#define T2 T2_PARAM
-#else 
-#define T2 90 /* T2 > T1 always! */
-#endif
-
-
-
-#define SHORT_ADDR_SIZE 19
-
-typedef struct cache_item {
-	BLOOM bloomname;
-	uip_ipaddr_t owner_addr;
-	uip_ipaddr_t provider_neighbor_addr;
-	clock_time_t timestamp;
-} CACHEITEM;
-
-int proximity_cache_init();
-int proximity_cache_size();
-int proximity_cache_add_item(CACHEITEM ci);
-int proximity_cache_force_add_item(CACHEITEM ci);
-int proximity_cache_print();
-int proximity_cache_check_item(CACHEITEM* ci);
-CACHEITEM* proximity_cache_get_item(int i);
-CACHEITEM* proximity_cache_get_most_similar_item(BLOOM* bloomname, uip_ipaddr_t* provider_ipaddr);
-
-#endif
+#endif 

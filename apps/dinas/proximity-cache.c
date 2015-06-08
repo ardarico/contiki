@@ -145,6 +145,69 @@ int proximity_cache_add_item(CACHEITEM ci) {
 
 
 /*---------------------------------------------------------------------------*/
+int proximity_cache_force_add_item(CACHEITEM ci) {
+	int i = proximity_cache_check_item(&ci);
+	//int D = cs*BLOOM_SIZE;
+	
+	/*PRINTF("add: i = %d \n", i);*/
+	/*
+	PRINTF("add: D = %d \n", D);
+	PRINTF("add: T1*D = %d \n", T1*D);
+	PRINTF("cs = %d\n", cs);
+	*/
+	
+	if (cs < CACHE_SIZE) /* A) the cache is not full */
+	  {
+		if (i == CACHE_SIZE) { /* the item is not in cache */
+			/*printf("A, i==0 .. \n");*/
+			cache[cs] = ci;
+			cs += 1; 
+		}
+		else {
+			/*
+			PRINTF("A, i>0 .. \n");
+			PRINTF("The item is already in the cache, in position %d.\n", i);
+			*/
+			/* add the item only if the owner is different */
+			/*if (strcmp(cache[i].owner_addr,ci.owner_addr) != 0) */
+			if (!uip_ipaddr_cmp(&(cache[i].owner_addr), &(ci.owner_addr))) 
+			{
+				/*PRINTF("The owner is different, let's add the new item.\n");*/
+				cache[cs] = ci;
+				cs += 1; 
+			}
+			else 
+				cache[i].timestamp = ci.timestamp;
+		}
+	  }
+	else /* B) the cache is full */ 
+	  {
+		if (i == CACHE_SIZE) { /* the item is not in cache */
+			/*PRINTF("B, i==0 .. \n");	*/
+			int oldest = get_oldest_item();
+			cache[oldest] = ci;
+		}
+		else {
+			/*
+			PRINTF("B, i>0 .. \n");
+			PRINTF("The item is already in the cache, in position %d.\n", i);
+			*/
+			/* replace the item only if the owner is different */
+			/* if (strcmp(cache[i].owner_addr,ci.owner_addr) != 0) */
+			if (!uip_ipaddr_cmp(&(cache[i].owner_addr), &(ci.owner_addr)))
+			{
+				/*PRINTF("The owner is different, let's replace the old item.\n");*/
+				cache[i] = ci;
+			}
+			else 
+				cache[i].timestamp = ci.timestamp;
+		}
+	  }
+	return 0;
+}
+
+
+/*---------------------------------------------------------------------------*/
 int proximity_cache_print() 
 {
 	int i;

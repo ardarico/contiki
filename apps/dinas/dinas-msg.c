@@ -33,7 +33,13 @@
  *         Michele Amoretti <michele.amoretti@unipr.it> 
  */
 
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 #include "dinas-msg.h"
+#define DEBUG DEBUG_PRINT
+#include "net/ip/uip-debug.h"
+
 
 /*---------------------------------------------------------------------------*/
 uint8_t dinas_msg_set_config(uint8_t direction, uint8_t type, uint8_t ttl)
@@ -45,6 +51,8 @@ uint8_t dinas_msg_set_config(uint8_t direction, uint8_t type, uint8_t ttl)
   	config += 2;
   else if (type == 2) /* reply */		
   	config += 4;
+  else if (type == 3) /* neighbor announcement */
+    config += 6;	
   ttl = ttl * 8; /* shift left by 3*/
   config += ttl;	
   return config;	
@@ -60,9 +68,20 @@ uint8_t dinas_msg_get_direction(uint8_t config)
 /*---------------------------------------------------------------------------*/
 uint8_t dinas_msg_get_type(uint8_t config)
 {
-	config = config & 6;
-	config = config/2; 
-	return config; /* return 0 if type is 00, 1 if type is 01, 2 if type is 10 */
+  uint8_t type;	
+  type = 0;
+  //PRINTF("config = %d \n", config);
+  config = config & 6;
+  //PRINTF("config = %d \n", config);
+  if (config == 0) 
+    type = 0; /* notification */
+  else if (config == 2)
+    type = 1; /* request */
+  else if (config == 4)
+    type = 2; /* reply */  
+  else if (config == 6)
+    type = 3; /* neighbor announcement */ 
+  return type;   
 }
 
 /*---------------------------------------------------------------------------*/
