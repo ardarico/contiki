@@ -130,6 +130,7 @@ rpl_dht_recv(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* 
       reply.req_num = msg->req_num;
       destination_ipaddr = msg->owner_addr;
       PRINTF("hit %d\n", msg->req_num);
+      bloom_print(&msg->bloom);
       /*
       PRINTF("Now sending reply to ");
       PRINT6ADDR(&destination_ipaddr);
@@ -188,23 +189,25 @@ set_random_destination(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr)
 uip_ipaddr_t* 
 rpl_dht_find_successor(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr) 
 {
+  PRINTF("find_successor:\n");	
   BLOOM name = msg->bloom;
-  int distance = BLOOM_SIZE;
-  //PRINTF("distance = %d\n", distance);
-  uip_ipaddr_t* successor_addr = provider_ipaddr;
+  //int distance = BLOOM_SIZE;
+  int distance = dinas_msg_get_ttl(msg->config);
+  PRINTF("initial distance = %d\n", distance);
+  uip_ipaddr_t* successor_addr = provider_ipaddr; 
+  successor_addr->u16[0] = 0xaaaa;
+  sprintf(destination, "NO-DEST");
   int i;
   for (i = 0; i < num_children_announcements; i++) {
     if (bloom_distance(&name, &children_announcements[i].bloom) < distance) {	
   	  distance = bloom_distance(&name, &children_announcements[i].bloom); 
-  	  //PRINTF("distance = %d\n", distance);
+  	  PRINTF("distance = %d\n", distance);
   	  successor_addr = &children_announcements[i].owner_addr;
+  	  
+  	  msg->config = dinas_msg_set_config(0, dinas_msg_get_type(msg->config), distance);
     }
   }
-  //PRINTF("config = %d\n", msg->config);
-  //PRINTF("ttl = %d\n", dinas_msg_get_ttl(msg->config));
-  if (distance < dinas_msg_get_ttl(msg->config)) // this can be true only if distance < BLOOM_SIZE
-  	msg->config = dinas_msg_set_config(0, dinas_msg_get_type(msg->config), distance);
-  	  
+
   return successor_addr;
 }
 
@@ -263,16 +266,25 @@ rpl_dht_send(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* 
     //PRINTF("down\n");
     if (num_children == 0) /* no children */
     {
-      // store locally
-      rpl_dht_store_item(msg, provider_ipaddr);	
+      if (dinas_msg_get_type(msg->config) == 0) { // notification 	
+      	// store locally
+        rpl_dht_store_item(msg, provider_ipaddr);	
+        PRINTF("no children: name stored locally \n");
+        bloom_print(&msg->bloom);
+      }
       return; /* do not further propagate the msg */
     }
   	
   	// select destination
   	destination_ipaddr = *rpl_dht_find_successor(msg, provider_ipaddr);
-  	if (uip_ipaddr_cmp(&destination_ipaddr, provider_ipaddr)) { // the msg must stop here
+  	//if (uip_ipaddr_cmp(&destination_ipaddr, provider_ipaddr)) { 
+  	if (destination_ipaddr.u16[0] == 0xaaaa) {	
   	  sprintf(destination, "NO-DEST");
-  	  rpl_dht_store_item(msg, provider_ipaddr);	
+  	  if (dinas_msg_get_type(msg->config) == 0) { // notification
+  	    rpl_dht_store_item(msg, provider_ipaddr);
+  	    PRINTF("no further propagation: name stored locally \n");
+        bloom_print(&msg->bloom);	
+  	  }
       return; /* do not further propagate the msg */
   	}
   	else
@@ -280,11 +292,13 @@ rpl_dht_send(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* 
   }
     
   if (strcmp(destination, "NO-DEST") != 0) {
-  	/*
-    PRINTF("Sending to: ");
+  	
+    PRINTF("Sending ");
+    bloom_print(&msg->bloom);
+    PRINTF("to ");
     PRINT6ADDR(&destination_ipaddr);
     PRINTF("\n");
-    */
+   
     uip_udp_packet_sendto(client_conn, msg, sizeof(DINASMSG),
                           &destination_ipaddr, UIP_HTONS(UDP_SERVER_PORT)); 
     sent_messages += 1; 
@@ -413,7 +427,8 @@ void rpl_dht_store_item(DINASMSG *msg, uip_ipaddr_t* provider_ipaddr)
   ci.provider_neighbor_addr = *provider_ipaddr;
   time = get_time();
   ci.timestamp = time;
-  proximity_cache_add_item(ci);
+  //proximity_cache_add_item(ci);
+  proximity_cache_force_add_item(ci);
   //proximity_cache_print();
 }
 

@@ -217,8 +217,9 @@ PROCESS_THREAD(dinas_peer_process, ev, data)
           	/* if request's bloomname == this node's bloomname, then send reply msg to the request owner and return */
           	if (bloom_distance(&msg->bloom,&bloomname) == 0)
           	{
-          	  /*	
+          	  PRINTF("hit %d ", msg->req_num);	
           	  bloom_print(&msg->bloom);
+          	  /*	
           	  bloom_print(&bloomname);
           	  */
           	  DINASMSG reply;
@@ -227,7 +228,7 @@ PROCESS_THREAD(dinas_peer_process, ev, data)
           	  reply.config = dinas_msg_set_config(0,2,0);
           	  reply.req_num = msg->req_num;
               destination_ipaddr = msg->owner_addr;
-		  	  PRINTF("hit %d\n", msg->req_num);
+		  	  
               /*
               PRINTF("Got it! Now sending reply to ");
               PRINT6ADDR(&destination_ipaddr);
@@ -310,7 +311,7 @@ PROCESS_THREAD(send_process, ev, data)
             DINASMSG msg;
             msg.config = dinas_msg_set_config(1,3,0); /* neighbor announcement, with direction up */ 
             msg.bloom = bloomname;
-            msg.owner_addr = global_ipaddr;
+            msg.owner_addr = local_ipaddr;
             PRINTF("msg type: %d \n", dinas_msg_get_type(msg.config));
           
             // send to the parent
@@ -338,7 +339,7 @@ PROCESS_THREAD(send_process, ev, data)
   		      }
   		      	
   		      msg.config = dinas_msg_set_config(1,0,TTL); /* notification, with direction up */ 
-  		      PRINTF("notification config %d\n", msg.config);
+  		      PRINTF("notification\n");
   		      count = 1;
               msg.bloom = bloomname;
   		    }
@@ -352,8 +353,8 @@ PROCESS_THREAD(send_process, ev, data)
   		      PRINTF("request ttl %d\n", dinas_msg_get_ttl(msg.config));	
   		      */  
   		      req_count++;
-  		      PRINTF("rq %d\n", req_count);
-  		    
+  		      PRINTF("rq %d ", req_count);
+  		       		    
   		      int room_number = 0;
   		      do 
   		      {
@@ -380,7 +381,8 @@ PROCESS_THREAD(send_process, ev, data)
     			bloom_add(&bloom, "space:Floor2");
     		  sprintf(location, "space:Room-%d", room_number);
               bloom_add(&bloom, location);
-              //bloom_print(&bloom);
+              bloom_print(&bloom);
+              
               msg.bloom = bloom;
               msg.req_num = req_count;
             
@@ -392,7 +394,8 @@ PROCESS_THREAD(send_process, ev, data)
       	        //PRINTF("In my cache!\n");
       	        rep_num++;
       	        loc_rep_num++;
-                PRINTF("hit %d\n", msg.req_num);
+                PRINTF("hit %d ", msg.req_num);	
+          	    bloom_print(&msg.bloom);
           	    return -1;
               }
   		    }
