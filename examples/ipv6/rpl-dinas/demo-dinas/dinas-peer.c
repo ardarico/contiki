@@ -157,87 +157,99 @@ PROCESS_THREAD(dinas_peer_process, ev, data)
     PROCESS_YIELD();
     if(ev == tcpip_event) {
       if(uip_newdata()) {
-        
-        /*
-        PRINTF("-----------\n I am a peer: ");
-        PRINT6ADDR(&global_ipaddr);
-        PRINTF("\n");
-        */
-        //PRINTF("-- recv --\n");
-        /*
-        PRINTF("Received msg from ");
-        PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
-        PRINTF("\n");
-        */
-        
-        if (first_recv == 1)
-        {
-          rpl_updown_set_children();
-          first_recv = 0;
+      	
+      	DINASMSG *msg = (DINASMSG *)uip_appdata;
+      	
+      	unsigned short r = random_rand();
+  	    //PRINTF("r = %u\n", r);
+  	    unsigned short i = (r)%(100) + 1;
+  	    //PRINTF("i = %u\n", i);
+        if ((i < P_FAIL) && (dinas_msg_get_type(msg->config) == 1)) {
+        	PRINTF("Request failure!\n");
         }
+        else {
         
-        uip_ipaddr_t ipaddr;
-           
-        DINASMSG *msg = (DINASMSG *)uip_appdata; 
-        
-        if (dinas_msg_get_type(msg->config) == 2) /* msg is a reply */
-        {
-          rep_num++;
-          PRINTF("rp %d\n", msg->req_num); 
-          ipaddr = *rpl_updown_get_parent_ipaddr(); /* replies to peers always come from their parent */
-          /* peers do store replies! */
-          rpl_updown_store_item(msg, &ipaddr);
           /*
-          PRINTF("Received reply from ");
-          PRINT6ADDR(&ipaddr);
-          PRINTF("\n");       
+          PRINTF("-----------\n I am a peer: ");
+          PRINT6ADDR(&global_ipaddr);
+          PRINTF("\n");
           */
-          return -1;	
-        }
-        else /* msg is a notification or a request */
-        {	
-          /*	
-          if (msg->type == 0) 	
-            PRINTF("Received notification from %s\n", short_ipaddr);
-          else if (msg->type == 1) 
-            PRINTF("Received request from from %s\n", short_ipaddr);
-          */
-          /*  
+          //PRINTF("-- recv --\n");
+          /*
+          PRINTF("Received msg from ");
           PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
-          PRINTF("\n");	
+          PRINTF("\n");
           */
-          
-          ipaddr = UIP_IP_BUF->srcipaddr;
-          
-          /* if the peer can answer a request, it's rpl_updown_recv() that will check */
-          if (dinas_msg_get_type(msg->config) == 1) /* msg is a request */
+        
+          if (first_recv == 1)
           {
-          	/* if request's bloomname == this node's bloomname, then send reply msg to the request owner and return */
-          	if (bloom_distance(&msg->bloom,&bloomname) == 0)
-          	{
-          	  /*	
-          	  bloom_print(&msg->bloom);
-          	  bloom_print(&bloomname);
-          	  */
-          	  DINASMSG reply;
-          	  reply.bloom = bloomname;
-          	  reply.owner_addr = global_ipaddr;
-          	  reply.config = dinas_msg_set_config(0,2,0);
-          	  reply.req_num = msg->req_num;
-              destination_ipaddr = msg->owner_addr;
-		  PRINTF("hit %d\n", msg->req_num);
-              /*
-              PRINTF("Got it! Now sending reply to ");
-              PRINT6ADDR(&destination_ipaddr);
-              PRINTF("\n");
-              */
-              uip_udp_packet_sendto(client_conn, &reply, sizeof(DINASMSG),
-                          &destination_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
-              return -1;            
-          	}
+            rpl_updown_set_children();
+            first_recv = 0;
           }
+        
+          uip_ipaddr_t ipaddr;
+           
+          //DINASMSG *msg = (DINASMSG *)uip_appdata; 
+        
+          if (dinas_msg_get_type(msg->config) == 2) /* msg is a reply */
+          {
+            rep_num++;
+            PRINTF("rp %d\n", msg->req_num); 
+            ipaddr = *rpl_updown_get_parent_ipaddr(); /* replies to peers always come from their parent */
+            /* peers do store replies! */
+            rpl_updown_store_item(msg, &ipaddr);
+            /*
+            PRINTF("Received reply from ");
+            PRINT6ADDR(&ipaddr);
+            PRINTF("\n");       
+            */
+            return -1;	
+          }
+          else /* msg is a notification or a request */
+          {	
+            /*	
+            if (msg->type == 0) 	
+              PRINTF("Received notification from %s\n", short_ipaddr);
+            else if (msg->type == 1) 
+              PRINTF("Received request from from %s\n", short_ipaddr);
+            */
+            /*  
+            PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
+            PRINTF("\n");	
+            */
           
-	      rpl_updown_recv(msg, &ipaddr, client_conn);
+            ipaddr = UIP_IP_BUF->srcipaddr;
+          
+            /* if the peer can answer a request, it's rpl_updown_recv() that will check */
+            if (dinas_msg_get_type(msg->config) == 1) /* msg is a request */
+            {
+              /* if request's bloomname == this node's bloomname, then send reply msg to the request owner and return */
+          	  if (bloom_distance(&msg->bloom,&bloomname) == 0)
+          	  {
+          	    /*	
+          	    bloom_print(&msg->bloom);
+          	    bloom_print(&bloomname);
+          	    */
+          	    DINASMSG reply;
+          	    reply.bloom = bloomname;
+          	    reply.owner_addr = global_ipaddr;
+          	    reply.config = dinas_msg_set_config(0,2,0);
+          	    reply.req_num = msg->req_num;
+                destination_ipaddr = msg->owner_addr;
+		        PRINTF("hit %d\n", msg->req_num);
+                /*
+                PRINTF("Got it! Now sending reply to ");
+                PRINT6ADDR(&destination_ipaddr);
+                PRINTF("\n");
+                */
+                uip_udp_packet_sendto(client_conn, &reply, sizeof(DINASMSG),
+                          &destination_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+                return -1;            
+          	  }
+            }
+          
+	        rpl_updown_recv(msg, &ipaddr, client_conn);
+          }
         }
       }
     }

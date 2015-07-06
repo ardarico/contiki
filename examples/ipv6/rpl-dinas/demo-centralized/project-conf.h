@@ -37,9 +37,9 @@
 
 #define MAX_NUM_MSG 21
 #define NOTIFICATION_COUNTER 10
-#define NUM_ROOMS 50
+#define NUM_ROOMS 20
 #define TTL 4
-#define PERIOD 600
+#define PERIOD 120
 #define RANDWAIT (PERIOD)
 
 /* overwrite params defined in bloom.h */

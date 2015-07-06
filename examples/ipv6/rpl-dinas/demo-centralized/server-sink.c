@@ -211,7 +211,8 @@ PROCESS_THREAD(dinas_sink_process, ev, data)
           int i = proximity_cache_check_item(&ci);
           if (i != CACHE_SIZE) 
           { 
-          	PRINTF("I've got it in my cache! Now sending reply to \n");
+          	//PRINTF("I've got it in my cache! Now sending reply to \n");
+          	PRINTF("hit %d\n", msg->req_num);
             DINASMSG reply;
       		reply.bloom = msg->bloom;
       		reply.owner_addr = proximity_cache_get_item(i)->owner_addr;

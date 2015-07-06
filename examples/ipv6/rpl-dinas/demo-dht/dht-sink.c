@@ -302,6 +302,7 @@ PROCESS_THREAD(send_process, ev, data)
               
   		  if (msg_count == -1)
   		  {
+  		  	rpl_dht_set_bloomname(bloomname);
   		  	rpl_dht_set_parent();
   		  	rpl_dht_set_children();
   		  	msg_count++;

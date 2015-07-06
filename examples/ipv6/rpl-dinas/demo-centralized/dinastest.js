@@ -7,7 +7,7 @@
  * This script logs everything.
  */
 
-TIMEOUT(3000000); /* msec; 1500000 = 25 minutes; 3000000 usato per test paper WCNC; 4200000 per test con periodo 180 */
+TIMEOUT(3200000); /* msec; 1500000 = 25 minutes; 3000000 usato per test paper WCNC; 4200000 per test con periodo 180 */
 
 while (true) {
   log.log(time + ":" + id + ":" + msg + "\n");

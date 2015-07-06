@@ -48,9 +48,11 @@
 #define BLOOM_NFUNCS_PARAM 7
 
 /* overwrite params defined in proximity-cache.h */
-#define CACHE_SIZE_PARAM 8 /* this is C */
-#define T1_PARAM 30
+#define CACHE_SIZE_PARAM 20 /* this is C */
+#define T1_PARAM 0
 #define T2_PARAM 90
+
+#define P_FAIL 20
 
 
 

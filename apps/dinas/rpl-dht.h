@@ -38,6 +38,7 @@
 
 #include "contiki.h"
 #include "net/ip/uip.h"
+#include "lib/bloom.h"
 #include "dinas-msg.h"
 
 #ifdef FLOODING_PARAM
@@ -54,9 +55,10 @@ void rpl_dht_recv(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_c
 void rpl_dht_send(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* client_conn);
 void rpl_dht_send_to_children(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* client_conn);
 int rpl_dht_sent_messages();
+void rpl_dht_set_bloomname(BLOOM bn);
 void rpl_dht_set_parent();
 void rpl_dht_set_children();
 void rpl_dht_add_child_announcement(DINASMSG* msg);
-void rpl_dht_store_item(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr);
+void rpl_dht_store_item(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, int force);
 
 #endif 

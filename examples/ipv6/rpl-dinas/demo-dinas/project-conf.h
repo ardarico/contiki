@@ -55,4 +55,5 @@
 /* overwrite params defined in dinas-updown.h */
 #define FLOODING_PARAM 0
 
+#define P_FAIL 10
 
