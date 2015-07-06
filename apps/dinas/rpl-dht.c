@@ -228,11 +228,12 @@ rpl_dht_send(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* 
   	send the msg to the most suitable children (if the cache is empty, randomly select the destination)
   */
   
+  char temp[40];
+  sprint6addr(temp, &uip_ds6_if.addr_list[0].ipaddr);	
+  
   /*PRINTF("msg dir: %d\n", dinas_msg_get_direction(msg->config));*/
   if (dinas_msg_get_direction(msg->config) == 1) // up 
   {
-  	char temp[40];
-    sprint6addr(temp, &uip_ds6_if.addr_list[0].ipaddr);	
     //PRINTF("temp = %s\n", temp);
     if (strncmp(temp,"aaaa",4) == 0) /* this is the sink */
     {
@@ -298,6 +299,7 @@ rpl_dht_send(DINASMSG* msg, uip_ipaddr_t* provider_ipaddr, struct uip_udp_conn* 
   	  sprint6addr(destination, &destination_ipaddr);
   	  
   	  if (strncmp(temp,"aaaa",4) != 0) /* this is not the sink */
+  	  {
   	  	/* store name along the notification path */
   	  	if (dinas_msg_get_type(msg->config) == 0)  // notification
   	   	  rpl_dht_store_item(msg, provider_ipaddr, 0);  
